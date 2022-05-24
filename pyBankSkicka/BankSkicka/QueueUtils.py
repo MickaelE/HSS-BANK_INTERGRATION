@@ -17,8 +17,9 @@
 # ------------------------------------------------------------------------------
 import cx_Oracle
 import cx_Oracle as oracleDb
-from BankSkicka.DButil import DButil
-from BankSkicka.SecureEnvelope import SecureEnvelope
+from DButil import DButil
+from SecureEnvelope import SecureEnvelope
+from NoEnvelope import NoEnvelope
 
 
 def output_type_handler(cursor, name, default_type, size, precision, scale):
@@ -47,5 +48,5 @@ class QueueUtil:
         while True:
             for m in queue.deqMany(10):
                 xml_str = m.payload.XMLFIL.read()
-                SecureEnvelope.__secure_envelope__(xml_str)
+                NoEnvelope.__createXML__(xml_str)
                 connection.commit()
