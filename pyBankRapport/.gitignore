@@ -1,0 +1,7 @@
+/dist/
+*.spec
+/build/
+*config.py
+/venv/
+/logs/
+/Test/
