@@ -129,3 +129,10 @@ dmypy.json
 .pyre/
 /.idea/workspace.xml
 *.ini
+/.idea/HSS-BANK_INTERGRATION.iml
+/pyBankSkicka/.idea/
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
