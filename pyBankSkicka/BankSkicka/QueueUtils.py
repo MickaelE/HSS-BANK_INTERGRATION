@@ -17,9 +17,10 @@
 # ------------------------------------------------------------------------------
 import cx_Oracle
 import cx_Oracle as oracleDb
-from DButil import DButil
-from SecureEnvelope import SecureEnvelope
-from NoEnvelope import NoEnvelope
+
+from pyBankSkicka.BankSkicka.DButil import DButil
+from pyBankSkicka.BankSkicka.NoEnvelope import NoEnvelope
+from pyBankSkicka.BankSkicka.SecureEnvelope import SecureEnvelope
 
 
 def output_type_handler(cursor, name, default_type, size, precision, scale):
@@ -47,6 +48,10 @@ class QueueUtil:
         print("\nDequeuing messages...")
         while True:
             for m in queue.deqMany(10):
+                xml_file_name = m.payload.FILNAMN
                 xml_str = m.payload.XMLFIL.read()
-                NoEnvelope.__createXML__(xml_str)
+                if 'SCT' in xml_file_name:
+                    SecureEnvelope.__secure_envelope__(xml_str)
+                else:
+                    NoEnvelope.__createXML__(xml_str)
                 connection.commit()
