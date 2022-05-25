@@ -1,4 +1,6 @@
-import xml.etree.ElementTree as ET
+import base64
+
+import lxml.etree as ET
 
 
 class SecureEnvelope:
@@ -19,12 +21,15 @@ class SecureEnvelope:
         self.X509SerialNumber = X509SerialNumber
         self.X509Certificate = X509Certificate
         self.fileName = fileName
-        self.xmlns_uris = {'': 'http://bxd.fi/xmldata/',
+        self.xmlns_uris = {'xmlns':'ttp://bxd.fi/xmldata/',
                            'xsi': 'http://www.w3.org/2001/XMLSchema-instance/'}
 
     def CreateXml(self):
-        root_node = ET.Element("ApplicationRequest")
+        nsmap = {None: "http://bxd.fi/xmldata/",'xsi': 'http://www.w3.org/2001/XMLSchema-instance/',}
+
+        root_node = ET.Element('ApplicationRequest', nsmap=nsmap)
         # region root
+
         customerid = ET.SubElement(root_node, "CustomerId")
         customerid.text = self.CustomerId
         command = ET.SubElement(root_node, "Command")
@@ -40,7 +45,7 @@ class SecureEnvelope:
         filetype = ET.SubElement(root_node, "FileType")
         filetype.text = self.filetype
         content = ET.SubElement(root_node, "Content")
-        content.text = self.content
+        content.text = base64.encodebytes(self.content.encode('utf-8'))
         # endregion root
         # region Signature
         signature = ET.SubElement(root_node, "Signature",
@@ -75,14 +80,14 @@ class SecureEnvelope:
         x509issuername.text = self.X509IssuerName
         x509serialnumber = ET.SubElement(x509issuerserial, "X509SerialNumber")
         x509serialnumber.text = self.X509SerialNumber
-        x509certificate = ET.SubElement(keyinfo, "X509Certificate")
+        x509certificate = ET.SubElement(x509data, "X509Certificate")
         x509certificate.text = self.X509Certificate
         # endregion X509Data
         # endregion KeyInfo
         # endregion Signature
-        add_XMLNS_attributes(root_node, self.xmlns_uris)
+
         tree = ET.ElementTree(root_node)
-        tree.write(self.fileName)
+        tree.write(self.fileName,xml_declaration=True, encoding='utf-8')
 
 
 def annotate_with_XMLNS_prefixes(tree, xmlns_prefix,
@@ -101,4 +106,8 @@ def add_XMLNS_attributes(tree, xmlns_uris_dict):
     if not ET.iselement(tree):
         tree = tree.getroot()
     for prefix, uri in xmlns_uris_dict.items():
-        tree.attrib['xmlns:' + prefix] = uri
+        if prefix == ' ':
+            tree.attrib['xmlns'] = uri
+        else:
+            tree.attrib['xmlns:' + prefix] = uri
+
