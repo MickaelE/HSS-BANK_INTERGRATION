@@ -19,8 +19,8 @@ import cx_Oracle
 import cx_Oracle as oracleDb
 
 from pyBankSkicka.BankSkicka.DButil import DButil
-from pyBankSkicka.BankSkicka.NoEnvelope import NoEnvelope
-from pyBankSkicka.BankSkicka.SecureEnvelope import SecureEnvelope
+from pyBankSkicka.BankSkicka.SendToSeb import SendToSeb
+from pyBankSkicka.BankSkicka.SendToNordea import SendToNordea
 
 
 def output_type_handler(cursor, name, default_type, size, precision, scale):
@@ -50,8 +50,8 @@ class QueueUtil:
             for m in queue.deqMany(10):
                 xml_file_name = m.payload.FILNAMN
                 xml_str = m.payload.XMLFIL.read()
-                if 'SCT' in xml_file_name:
-                    SecureEnvelope.__secure_envelope__(xml_str)
+                if 'SGC' in xml_file_name:
+                    SendToNordea.createXML(xml_str)
                 else:
-                    NoEnvelope.__createXML__(xml_str)
+                    SendToSeb.createXML(xml_str)
                 connection.commit()

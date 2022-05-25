@@ -1,7 +1,9 @@
 import base64
-
+import os
 import lxml.etree as ET
+from global_logger import Log
 
+log = Log.get_logger(logs_dir='logs')
 
 class SecureEnvelope:
     def __init__(self, CustomerId, Command, Timestamp, environment, targetid,
@@ -21,73 +23,80 @@ class SecureEnvelope:
         self.X509SerialNumber = X509SerialNumber
         self.X509Certificate = X509Certificate
         self.fileName = fileName
-        self.xmlns_uris = {'xmlns':'ttp://bxd.fi/xmldata/',
+        self.xmlns_uris = {'xmlns': 'ttp://bxd.fi/xmldata/',
                            'xsi': 'http://www.w3.org/2001/XMLSchema-instance/'}
 
     def CreateXml(self):
-        nsmap = {None: "http://bxd.fi/xmldata/",'xsi': 'http://www.w3.org/2001/XMLSchema-instance/',}
+        try:
+            nsmap = {None: "http://bxd.fi/xmldata/",
+                     'xsi': 'http://www.w3.org/2001/XMLSchema-instance/', }
 
-        root_node = ET.Element('ApplicationRequest', nsmap=nsmap)
-        # region root
+            root_node = ET.Element('ApplicationRequest', nsmap=nsmap)
+            # region root
 
-        customerid = ET.SubElement(root_node, "CustomerId")
-        customerid.text = self.CustomerId
-        command = ET.SubElement(root_node, "Command")
-        command.text = self.Command
-        timestamp = ET.SubElement(root_node, "Timestamp")
-        timestamp.text = self.Timestamp
-        environment = ET.SubElement(root_node, "Environment")
-        environment.text = self.environment
-        targetid = ET.SubElement(root_node, "TargetId")
-        targetid.text = self.targetid
-        softwareid = ET.SubElement(root_node, "SoftwareId")
-        softwareid.text = self.softwareid
-        filetype = ET.SubElement(root_node, "FileType")
-        filetype.text = self.filetype
-        content = ET.SubElement(root_node, "Content")
-        content.text = base64.encodebytes(self.content.encode('utf-8'))
-        # endregion root
-        # region Signature
-        signature = ET.SubElement(root_node, "Signature",
-                                  xmlns="http://www.w3.org/2000/09/xmldsig#")
-        # region signedinfo
-        signedinfo = ET.SubElement(signature, "SignedInfo")
-        canonicalizationmethod = ET.SubElement(signedinfo,
-                                               "CanonicalizationMethod",
-                                               Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315")
-        signaturemethod = ET.SubElement(signedinfo, "SignatureMethod",
-                                        Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1")
+            customerid = ET.SubElement(root_node, "CustomerId")
+            customerid.text = self.CustomerId
+            command = ET.SubElement(root_node, "Command")
+            command.text = self.Command
+            timestamp = ET.SubElement(root_node, "Timestamp")
+            timestamp.text = self.Timestamp
+            environment = ET.SubElement(root_node, "Environment")
+            environment.text = self.environment
+            targetid = ET.SubElement(root_node, "TargetId")
+            targetid.text = self.targetid
+            softwareid = ET.SubElement(root_node, "SoftwareId")
+            softwareid.text = self.softwareid
+            filetype = ET.SubElement(root_node, "FileType")
+            filetype.text = self.filetype
+            content = ET.SubElement(root_node, "Content")
+            content.text = base64.encodebytes(self.content.encode('utf-8'))
+            # endregion root
+            # region Signature
+            signature = ET.SubElement(root_node, "Signature",
+                                      xmlns="http://www.w3.org/2000/09/xmldsig#")
+            # region signedinfo
+            signedinfo = ET.SubElement(signature, "SignedInfo")
+            canonicalizationmethod = ET.SubElement(signedinfo,
+                                                   "CanonicalizationMethod",
+                                                   Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315")
+            signaturemethod = ET.SubElement(signedinfo, "SignatureMethod",
+                                            Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1")
 
-        # region Reference
-        reference = ET.SubElement(signedinfo, "Reference", URI="")
-        transforms = ET.SubElement(reference, "Transforms")
-        transform = ET.SubElement(transforms, "Transform",
-                                  Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature")
-        digestmethod = ET.SubElement(reference, "DigestMethod",
-                                     Algorithm="http://www.w3.org/2000/09/xmldsig#sha1")
-        digestvalue = ET.SubElement(reference, "DigestValue")
-        digestvalue.text = self.DigestValue
-        # endregion Reference
-        # endregion signedinfo
-        signaturevalue = ET.SubElement(signature, "SignatureValue")
-        signaturevalue.text = self.SignatureValue
-        # region KeyInfo
-        keyinfo = ET.SubElement(signature, "KeyInfo")
-        # region X509Data
-        x509data = ET.SubElement(keyinfo, "X509Data")
-        x509issuerserial = ET.SubElement(x509data, "X509IssuerSerial")
-        x509issuername = ET.SubElement(x509issuerserial, "X509IssuerName")
-        x509issuername.text = self.X509IssuerName
-        x509serialnumber = ET.SubElement(x509issuerserial, "X509SerialNumber")
-        x509serialnumber.text = self.X509SerialNumber
-        x509certificate = ET.SubElement(x509data, "X509Certificate")
-        x509certificate.text = self.X509Certificate
-        # endregion X509Data
-        # endregion KeyInfo
-        # endregion Signature
-
-        tree = ET.ElementTree(root_node)
-        tree.write(self.fileName,xml_declaration=True, encoding='utf-8')
+            # region Reference
+            reference = ET.SubElement(signedinfo, "Reference", URI="")
+            transforms = ET.SubElement(reference, "Transforms")
+            transform = ET.SubElement(transforms, "Transform",
+                                      Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature")
+            digestmethod = ET.SubElement(reference, "DigestMethod",
+                                         Algorithm="http://www.w3.org/2000/09/xmldsig#sha1")
+            digestvalue = ET.SubElement(reference, "DigestValue")
+            digestvalue.text = self.DigestValue
+            # endregion Reference
+            # endregion signedinfo
+            signaturevalue = ET.SubElement(signature, "SignatureValue")
+            signaturevalue.text = self.SignatureValue
+            # region KeyInfo
+            keyinfo = ET.SubElement(signature, "KeyInfo")
+            # region X509Data
+            x509data = ET.SubElement(keyinfo, "X509Data")
+            x509issuerserial = ET.SubElement(x509data, "X509IssuerSerial")
+            x509issuername = ET.SubElement(x509issuerserial, "X509IssuerName")
+            x509issuername.text = self.X509IssuerName
+            x509serialnumber = ET.SubElement(x509issuerserial,
+                                             "X509SerialNumber")
+            x509serialnumber.text = self.X509SerialNumber
+            x509certificate = ET.SubElement(x509data, "X509Certificate")
+            x509certificate.text = self.X509Certificate
+            # endregion X509Data
+            # endregion KeyInfo
+            # endregion Signature
+            tree = ET.ElementTree(root_node)
+            filname = self.fileName
+            with open(str(filname), "wb") as f:
+                tree.write(f, encoding="utf-8")
+                log.debug('wrote file_contents to %s' % str(self.fileName))
+        except Exception as f:
+            log.error(str(f))
 
 
 def annotate_with_XMLNS_prefixes(tree, xmlns_prefix,
@@ -110,4 +119,3 @@ def add_XMLNS_attributes(tree, xmlns_uris_dict):
             tree.attrib['xmlns'] = uri
         else:
             tree.attrib['xmlns:' + prefix] = uri
-

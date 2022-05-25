@@ -24,9 +24,9 @@ import os
 log = Log.get_logger(logs_dir='logs')
 
 
-class NoEnvelope:
+class SendToSeb:
     @staticmethod
-    def __createXML__(content_string):
+    def createXML(content_string):
         """
         Create a xml file that coheres to the secure envelope standard
         :param content_string: A string (xml)
