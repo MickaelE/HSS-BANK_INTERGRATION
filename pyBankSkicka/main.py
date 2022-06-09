@@ -3,6 +3,7 @@
 import BankSkicka.QueueUtils
 from global_logger import Log
 from BankSkicka.QueueUtils import QueueUtil
+from SecureEnvelope import SecureEnvelope
 
 log = Log.get_logger(logs_dir='logs')
 """

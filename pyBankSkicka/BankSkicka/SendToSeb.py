@@ -1,8 +1,6 @@
 #  Copyright (c) 2022. Mickael Eriksson
 from configobj import ConfigObj, ConfigObjError, ConfigspecError
 from paramiko.ssh_exception import SSHException
-from BankSkicka.Communication import Communication
-import xml.etree.ElementTree as Et
 from datetime import datetime
 from global_logger import Log
 from MickeNet.PyGPGlib import PyGpgLib
@@ -20,6 +18,7 @@ import os
 # status = “Dev”
 # #####################################################
 # {code}
+from ftpClient import create_sftp_client
 
 log = Log.get_logger(logs_dir='logs')
 
@@ -32,6 +31,7 @@ class SendToSeb:
         :param content_string: A string (xml)
         :return: secure_envelope xml
         """
+        keyfiletype = None
         global retval
         bolag = ''  # CustomerUtil.getCurrCust(content_string)
         config = ConfigObj(os.getcwd() + '/config.ini')
@@ -71,11 +71,9 @@ class SendToSeb:
                 envelope = config['sftp2'].as_bool('envelope')
                 private_key = config['sftp2']['private_key']
             log.info("Trying to send to sftp")
-            communication = Communication(sfthost, sftpuser, sftppw, bank_dir, private_key)
-            if envelope:
-                communication.__send__(retval)
-            else:
-                communication.__send__(retval)
+            sftpclient =  create_sftp_client(sfthost, sftpuser, sftppw, bank_dir, private_key, keyfiletype)
+            # communication = Communication(sfthost, sftpuser, sftppw, bank_dir, private_key)
+            sftpclient.send(retval)
             retval = 0
         except (RuntimeError, TypeError, NameError, ValueError, IOError, IndexError) as err:
             log.error('EnvelopeError ..' + str(err))

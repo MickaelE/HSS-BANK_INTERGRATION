@@ -18,9 +18,9 @@
 import cx_Oracle
 import cx_Oracle as oracleDb
 
-from pyBankSkicka.BankSkicka.DButil import DButil
-from pyBankSkicka.BankSkicka.SendToSeb import SendToSeb
-from pyBankSkicka.BankSkicka.SendToNordea import SendToNordea
+from BankSkicka.DButil import DButil
+from BankSkicka.SendToSeb import SendToSeb
+from BankSkicka.SendToNordea import SendToNordea
 
 
 def output_type_handler(cursor, name, default_type, size, precision, scale):
@@ -39,7 +39,7 @@ class QueueUtil:
         connection = dbutil.__create_connection__()
         connection.outputtypehandler = output_type_handler
         # create queue
-        utbet_type = connection.gettype("SPORT.UTBETFIL_TYPE")
+        utbet_type = connection.gettype("UTBETFIL_TYPE")
         queue = connection.queue(queue_name, utbet_type)
         queue.deqoptions.wait = oracleDb.DEQ_WAIT_FOREVER
         queue.deqoptions.navigation = oracleDb.DEQ_FIRST_MSG
