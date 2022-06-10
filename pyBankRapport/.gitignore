@@ -1,0 +1,9 @@
+/dist/
+*.spec
+*.ini
+/build/
+*config.py
+/venv/
+/logs/
+/.idea/
+/xml/
