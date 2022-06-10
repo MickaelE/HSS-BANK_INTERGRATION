@@ -21,8 +21,7 @@ import os
 # status = “Dev”
 # #####################################################
 # {code}
-from ftpClient import create_sftp_client
-
+from pyBankSkicka.BankSkicka.ftpClient import create_sftp_client
 log = Log.get_logger(logs_dir='logs')
 
 

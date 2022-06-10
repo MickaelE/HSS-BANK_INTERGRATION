@@ -3,7 +3,6 @@
 import BankSkicka.QueueUtils
 from global_logger import Log
 from BankSkicka.QueueUtils import QueueUtil
-from SecureEnvelope import SecureEnvelope
 
 log = Log.get_logger(logs_dir='logs')
 """
@@ -14,7 +13,7 @@ Licens: MIT
 
 if __name__ == '__main__':
     log.info('######################################################')
-    log.info('pyBankSkicka version 0.1.2')
+    log.info('pyBankSkicka version 0.2.0')
     log.info('######################################################')
-    log.debug('pyBankSkicka version 0.1.2')
+    log.debug('pyBankSkicka version 0.2.0')
     QueueUtil.getQueue()

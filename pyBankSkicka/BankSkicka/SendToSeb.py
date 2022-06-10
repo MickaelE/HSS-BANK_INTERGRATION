@@ -18,7 +18,7 @@ import os
 # status = “Dev”
 # #####################################################
 # {code}
-from ftpClient import create_sftp_client
+from pyBankSkicka.BankSkicka.ftpClient import create_sftp_client
 
 log = Log.get_logger(logs_dir='logs')
 
@@ -71,8 +71,7 @@ class SendToSeb:
                 envelope = config['sftp2'].as_bool('envelope')
                 private_key = config['sftp2']['private_key']
             log.info("Trying to send to sftp")
-            sftpclient =  create_sftp_client(sfthost, sftpuser, sftppw, bank_dir, private_key, keyfiletype)
-            # communication = Communication(sfthost, sftpuser, sftppw, bank_dir, private_key)
+            sftpclient = create_sftp_client(sfthost, sftpuser, sftppw, bank_dir, private_key, keyfiletype)
             sftpclient.send(retval)
             retval = 0
         except (RuntimeError, TypeError, NameError, ValueError, IOError, IndexError) as err:
