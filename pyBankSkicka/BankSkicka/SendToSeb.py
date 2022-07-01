@@ -1,9 +1,9 @@
 #  Copyright (c) 2022. Mickael Eriksson
+from MickeNet.PyGPGlib import PyGpgLib
 from configobj import ConfigObj, ConfigObjError, ConfigspecError
 from paramiko.ssh_exception import SSHException
 from datetime import datetime
 from global_logger import Log
-from MickeNet.PyGPGlib import PyGpgLib
 import time
 import os
 
