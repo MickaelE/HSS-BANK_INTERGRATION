@@ -1,7 +1,8 @@
 #  Copyright (c) 2022. Mickael Eriksson
 import unittest
 from unittest import TestCase
-from BankSkicka.SecureEnvelope import SecureEnvelope
+
+from pyBankSkicka.BankSkicka.SecureEnvelope import SecureEnvelope
 
 
 class TestBankFile(TestCase):

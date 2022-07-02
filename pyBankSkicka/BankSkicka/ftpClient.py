@@ -1,10 +1,11 @@
 #  Copyright (c) 2022. Mickael Eriksson
 
 import paramiko
+from paramiko.ssh_exception import AuthenticationException
 
 
-class sftLib:
-    def create_sftp_client(self, host, port, username, password, keyfilepath, keyfiletype):
+class SftLib:
+    def create_sftp_client(self, host,username, password, keyfilepath, keyfiletype):
         """
         create_sftp_client(host, port, username, password, keyfilepath, keyfiletype) -> SFTPClient
 
@@ -17,7 +18,7 @@ class sftLib:
         key = None
         transport = None
         try:
-            if keyfilepath is not None:
+            if len(keyfilepath):
                 # Get private key used to authenticate user.
                 if keyfiletype == 'DSA':
                     # The private key is a DSA type key.
@@ -27,12 +28,15 @@ class sftLib:
                     key = paramiko.RSAKey.from_private_key(keyfilepath)
 
             # Create Transport object using supplied method of authentication.
+            port = int('22')
             transport = paramiko.Transport((host, port))
-            transport.connect(None, username, password, key)
+            transport.connect(None, username, password)
 
             sftp = paramiko.SFTPClient.from_transport(transport)
 
             return sftp
+        except AuthenticationException as ea:
+            print('Login error %s: %s' % (ea.__class__, ea))
         except Exception as e:
             print('An error occurred creating SFTP client: %s: %s' % (e.__class__, e))
             if sftp is not None:

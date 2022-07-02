@@ -1,11 +1,13 @@
 #  Copyright (c) 2022. Mickael Eriksson
+import os
+
 from MickeNet.PyGPGlib import PyGpgLib
 from configobj import ConfigObj, ConfigObjError, ConfigspecError
 from paramiko.ssh_exception import SSHException
 from datetime import datetime
 from global_logger import Log
 import time
-import os
+from pyBankSkicka.BankSkicka.ftpClient import SftLib
 
 # #####################################################
 # author= “Mickael Eriksson”
@@ -18,7 +20,6 @@ import os
 # status = “Dev”
 # #####################################################
 # {code}
-from pyBankSkicka.BankSkicka.ftpClient import create_sftp_client
 
 log = Log.get_logger(logs_dir='logs')
 
@@ -56,23 +57,16 @@ class SendToSeb:
         log.debug("signed")
         try:
             # Sending the data...
-            if bolag == 'SGC':
-                sfthost = config['sftp1']['host']
-                sftpuser = config['sftp1']['username']
-                sftppw = config['sftp1']['password']
-                bank_dir = config['sftp1']['bank_dir']
-                envelope = config['sftp1'].as_bool('envelope')
-                private_key = config['sftp1']['private_key']
-            else:
-                sfthost = config['sftp2']['host']
-                sftpuser = config['sftp2']['username']
-                sftppw = config['sftp2']['password']
-                bank_dir = config['sftp2']['bank_dir']
-                envelope = config['sftp2'].as_bool('envelope')
-                private_key = config['sftp2']['private_key']
+            sfthost = config['sftp1']['host']
+            sftpuser = config['sftp1']['username']
+            sftppw = config['sftp1']['password']
+            bank_dir = config['sftp1']['bank_dir']
+            envelope = config['sftp1'].as_bool('envelope')
+            private_key = config['sftp1']['private_key']
             log.info("Trying to send to sftp")
-            sftpclient = create_sftp_client(sfthost, sftpuser, sftppw, bank_dir, private_key, keyfiletype)
-            sftpclient.send(retval)
+            sftlib =  SftLib()
+            sftpclient = sftlib.create_sftp_client(sfthost, sftpuser, sftppw, private_key, keyfiletype)
+            sftpclient.put(retval,'/toseb/'+ os.path.basename(retval))
             retval = 0
         except (RuntimeError, TypeError, NameError, ValueError, IOError, IndexError) as err:
             log.error('EnvelopeError ..' + str(err))

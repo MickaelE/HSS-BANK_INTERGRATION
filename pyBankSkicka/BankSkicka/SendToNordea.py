@@ -17,7 +17,7 @@ import os
 # status = “Dev”
 # #####################################################
 # {code}
-from pyBankSkicka.BankSkicka.ftpClient import create_sftp_client
+from pyBankSkicka.BankSkicka.ftpClient import SftLib
 log = Log.get_logger(logs_dir='logs')
 
 
@@ -113,17 +113,17 @@ class SendToNordea:
         # log.debug("signed")
         try:
             # Sending the data...
-            if bolag == 'SGC':
-                sfthost = config['sftp1']['host']
-                sftpuser = config['sftp1']['username']
-                sftppw = config['sftp1']['password']
-                bank_dir = config['sftp1']['bank_dir']
-                envelope = config['sftp1'].as_bool('envelope')
-                private_key = config['sftp1']['private_key']
+            sfthost = config['sftp2']['host']
+            sftpuser = config['sftp2']['username']
+            sftppw = config['sftp2']['password']
+            bank_dir = config['sftp2']['bank_dir']
+            envelope = config['sftp2'].as_bool('envelope')
+            private_key = config['sftp2']['private_key']
             log.info("Trying to send to sftp")
-            sftpclient = create_sftp_client(sfthost, sftpuser, sftppw, bank_dir, private_key, keyfiletype)
+            sftpclient = SftLib()
+            sftpclient = sftpclient.create_sftp_client(sfthost, sftpuser, sftppw, private_key, keyfiletype)
 
-            sftpclient.send(retval)
+            sftpclient.put(retval, '/' + os.path.basename(retval))
 
             retval = 0
         except (RuntimeError, TypeError, NameError, ValueError, IOError,
