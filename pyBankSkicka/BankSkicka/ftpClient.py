@@ -17,23 +17,25 @@ class SftLib:
         sftp = None
         key = None
         transport = None
+        port = int('22')
+        transport = paramiko.Transport((host, port))
         try:
             if len(keyfilepath):
                 # Get private key used to authenticate user.
+                # Create Transport object using supplied method of authentication.
                 if keyfiletype == 'DSA':
+                    with open(keyfilepath) as keyfile:
                     # The private key is a DSA type key.
-                    key = paramiko.DSSKey.from_private_key_file(keyfilepath)
+                        key = paramiko.DSSKey.from_private_key_file(keyfile)
+                        transport.connect(None, username, password,key)
                 else:
                     # The private key is a RSA type key.
-                    key = paramiko.RSAKey.from_private_key(keyfilepath)
-
-            # Create Transport object using supplied method of authentication.
-            port = int('22')
-            transport = paramiko.Transport((host, port))
-            transport.connect(None, username, password)
-
+                    with open(keyfilepath) as keyfile:
+                        key = paramiko.RSAKey.from_private_key(keyfile)
+                        transport.connect(None, username, password,key)
+            else:
+                transport.connect(None, username, password)
             sftp = paramiko.SFTPClient.from_transport(transport)
-
             return sftp
         except AuthenticationException as ea:
             print('Login error %s: %s' % (ea.__class__, ea))

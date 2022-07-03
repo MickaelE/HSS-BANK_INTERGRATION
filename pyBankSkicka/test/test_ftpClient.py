@@ -22,7 +22,7 @@ class Test(TestSftpClient):
         sftppw = config['sftp1']['password']
         bank_dir = config['sftp1']['bank_dir']
         envelope = config['sftp1'].as_bool('envelope')
-        private_key = '' # config['sftp1']['private_key']
+        private_key = config['sftp1']['private_key']
         sftpclient = self.sftLib.create_sftp_client(sfthost,sftpuser,
                                                     sftppw, private_key, 'RSA')
         localpath = "/home/xmie/test_trav.gpg"
